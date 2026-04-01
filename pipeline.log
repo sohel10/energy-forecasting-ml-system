@@ -1,0 +1,87 @@
+2026-03-31 00:48:21,693 - INFO - 🚀 Pipeline started
+2026-03-31 00:48:21,826 - INFO - Ingested data: 40 rows
+2026-03-31 00:48:21,846 - INFO - Saved raw data to PostgreSQL
+2026-03-31 00:48:21,850 - INFO - Data cleaned
+2026-03-31 00:48:21,869 - INFO - Model trained
+2026-03-31 00:48:21,878 - INFO - Predictions saved
+2026-03-31 00:48:25,165 - INFO - 🚀 Pipeline started
+2026-03-31 00:48:25,308 - INFO - Ingested data: 40 rows
+2026-03-31 00:48:25,325 - INFO - Saved raw data to PostgreSQL
+2026-03-31 00:48:25,327 - INFO - Data cleaned
+2026-03-31 00:48:25,343 - INFO - Model trained
+2026-03-31 00:48:25,354 - INFO - Predictions saved
+2026-03-31 00:48:28,226 - INFO - 🚀 Pipeline started
+2026-03-31 00:48:28,374 - INFO - Ingested data: 40 rows
+2026-03-31 00:48:28,390 - INFO - Saved raw data to PostgreSQL
+2026-03-31 00:48:28,392 - INFO - Data cleaned
+2026-03-31 00:48:28,408 - INFO - Model trained
+2026-03-31 00:48:28,419 - INFO - Predictions saved
+2026-03-31 00:48:31,134 - INFO - 🚀 Pipeline started
+2026-03-31 00:48:31,274 - INFO - Ingested data: 40 rows
+2026-03-31 00:48:31,290 - INFO - Saved raw data to PostgreSQL
+2026-03-31 00:48:31,292 - INFO - Data cleaned
+2026-03-31 00:48:31,310 - INFO - Model trained
+2026-03-31 00:48:31,322 - INFO - Predictions saved
+2026-03-31 00:48:31,324 - INFO - 🚀 Pipeline started
+2026-03-31 00:48:31,457 - INFO - Ingested data: 40 rows
+2026-03-31 00:48:31,473 - INFO - Saved raw data to PostgreSQL
+2026-03-31 00:48:31,475 - INFO - Data cleaned
+2026-03-31 00:48:31,493 - INFO - Model trained
+2026-03-31 00:48:31,503 - INFO - Predictions saved
+2026-03-31 11:26:14,357 - INFO - 🚀 Pipeline started
+2026-03-31 11:26:14,488 - INFO - Ingested data: 40 rows
+2026-03-31 11:26:14,507 - INFO - Saved raw data to PostgreSQL
+2026-03-31 11:26:14,510 - INFO - Data cleaned
+2026-03-31 11:26:14,532 - INFO - Model trained
+2026-03-31 11:26:14,543 - INFO - Predictions saved
+2026-03-31 12:16:19,164 - INFO - 🚀 Pipeline started
+2026-03-31 12:16:19,298 - INFO - Ingested data: 40 rows
+2026-03-31 12:16:19,316 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:16:19,319 - INFO - Data cleaned
+2026-03-31 12:16:19,321 - INFO - Model trained
+2026-03-31 12:16:19,328 - ERROR - ❌ Pipeline failed: object of type 'NoneType' has no len()
+2026-03-31 12:20:30,962 - INFO - 🚀 Pipeline started
+2026-03-31 12:20:31,095 - INFO - Ingested data: 40 rows
+2026-03-31 12:20:31,115 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:20:31,117 - ERROR - ❌ Pipeline failed: name 'np' is not defined
+2026-03-31 12:20:50,556 - INFO - 🚀 Pipeline started
+2026-03-31 12:20:50,695 - INFO - Ingested data: 40 rows
+2026-03-31 12:20:50,717 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:20:50,720 - INFO - Data cleaned
+2026-03-31 12:20:50,722 - ERROR - Model failed, stopping pipeline
+2026-03-31 12:26:55,435 - INFO - 🚀 Pipeline started
+2026-03-31 12:26:56,029 - INFO - Ingested data: 40 rows
+2026-03-31 12:26:56,049 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:26:56,054 - INFO - Data cleaned
+2026-03-31 12:26:56,105 - INFO - Predictions saved
+2026-03-31 12:29:06,889 - INFO - 🚀 Pipeline started
+2026-03-31 12:29:07,013 - INFO - Ingested data: 40 rows
+2026-03-31 12:29:07,034 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:29:07,037 - INFO - Data cleaned
+2026-03-31 12:29:07,069 - INFO - Predictions saved
+2026-03-31 12:38:19,306 - INFO - 🚀 Pipeline started
+2026-03-31 12:38:19,694 - INFO - Ingested data: 40 rows
+2026-03-31 12:38:19,713 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:38:19,716 - INFO - Data cleaned
+2026-03-31 12:38:19,760 - INFO - Predictions saved
+2026-03-31 12:40:33,696 - INFO - 🚀 Pipeline started
+2026-03-31 12:40:33,866 - INFO - Ingested data: 40 rows
+2026-03-31 12:40:33,890 - INFO - Saved raw data to PostgreSQL
+2026-03-31 12:40:33,894 - INFO - Data cleaned
+2026-03-31 12:40:34,003 - INFO - Predictions saved
+2026-03-31 14:04:07,409 - INFO - 🚀 Pipeline started
+2026-03-31 14:04:07,554 - INFO - Ingested data: 40 rows
+2026-03-31 14:04:07,573 - INFO - Saved raw data to PostgreSQL
+2026-03-31 14:04:07,576 - INFO - Data cleaned
+2026-03-31 14:04:07,662 - ERROR - ❌ Pipeline failed: column "lower_ci" of relation "predictions" does not exist
+LINE 2: ...RT INTO predictions (datetime, actual, predicted, lower_ci, ...
+                                                             ^
+
+2026-03-31 14:05:38,861 - INFO - 🚀 Pipeline started
+2026-03-31 14:05:38,986 - INFO - Ingested data: 40 rows
+2026-03-31 14:05:39,006 - INFO - Saved raw data to PostgreSQL
+2026-03-31 14:05:39,010 - INFO - Data cleaned
+2026-03-31 14:06:06,694 - INFO - 🚀 Pipeline started
+2026-03-31 14:06:07,283 - INFO - Ingested data: 40 rows
+2026-03-31 14:06:07,303 - INFO - Saved raw data to PostgreSQL
+2026-03-31 14:06:07,306 - INFO - Data cleaned

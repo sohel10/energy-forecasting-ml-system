@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Energy Forecast Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 70%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            margin: auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>⚡ Energy Forecast Dashboard</h1>
+
+<button id="runBtn" onclick="getPrediction()">Run Prediction</button>
+
+<div class="card">
+    <p id="status"></p>
+    <p id="message"></p>
+</div>
+
+<div class="card" id="chartCard">
+    <canvas id="chart"></canvas>
+</div>
+
+<div class="card" id="tableDiv"></div>
+
+<script>
+let isLoading = false;
+
+async function getPrediction() {
+
+    if (isLoading) return;
+    isLoading = true;
+
+    const btn = document.getElementById("runBtn");
+    btn.disabled = true;
+    btn.innerText = "Running...";
+
+    try {
+        const res = await fetch('/predict');
+        const data = await res.json();
+
+        // Status
+        document.getElementById("status").innerHTML =
+            "<strong>Status:</strong> " + data.status;
+
+        document.getElementById("message").innerHTML =
+            "<strong>Message:</strong> " + data.message +
+            "<br><strong>RMSE:</strong> " + (data.rmse ? data.rmse.toFixed(4) : "N/A");
+
+        // Prepare data
+        const lower = data.data.map(d => d.lower);
+        const upper = data.data.map(d => d.upper);
+        const actual = data.data.map(d => d.actual);
+        const predicted = data.data.map(d => d.predicted);
+        const labels = data.data.map(d => d.datetime);;
+
+        // 🔥 RESET CANVAS (THIS FIXES YOUR PROBLEM)
+        const chartCard = document.getElementById("chartCard");
+        document.getElementById("chart").remove();
+
+        const newCanvas = document.createElement("canvas");
+        newCanvas.id = "chart";
+        chartCard.appendChild(newCanvas);
+
+        const ctx = newCanvas.getContext("2d");
+
+        // Draw chart
+        window.myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+
+            // 🔵 Actual
+            {
+                label: 'Actual',
+                data: actual,
+                borderColor: 'blue',
+                borderWidth: 3,
+                tension: 0.3,
+                pointRadius: 2
+            },
+
+            // 🔴 Predicted
+            {
+                label: 'Predicted',
+                data: predicted,
+                borderColor: 'red',
+                borderWidth: 3,
+                borderDash: [5,5],
+                tension: 0.3,
+                pointRadius: 2
+            },
+
+            // 🔶 Upper CI
+            {
+                label: 'Upper CI',
+                data: upper,
+                borderColor: 'rgba(255,0,0,0.3)',
+                borderWidth: 1,
+                pointRadius: 0
+            },
+
+            // 🔶 Lower CI (fills area)
+            {
+                label: 'Lower CI',
+                data: lower,
+                borderColor: 'rgba(255,0,0,0.3)',
+                borderWidth: 1,
+                fill: '-1',
+                backgroundColor: 'rgba(255,0,0,0.1)',
+                pointRadius: 0
+            }
+        ]
+            },
+
+                    // 🔥 ADD THIS BLOCK HERE (THIS IS WHAT YOU MISSED)
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            maxRotation: 45,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+
+        });
+        // Table
+        let html = `
+            <h3>Forecast Results</h3>
+            <table>
+                <tr>
+                    <th>Actual</th>
+                    <th>Predicted</th>
+                </tr>
+        `;
+
+        data.data.forEach(row => {
+            html += `
+                <tr>
+                    <td>${row.actual.toFixed(2)}</td>
+                    <td>${row.predicted.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        html += "</table>";
+
+        // 🔥 CLEAR FIRST (prevents stacking)
+        const tableDiv = document.getElementById("tableDiv");
+        tableDiv.innerHTML = "";
+        tableDiv.innerHTML = html;
+
+    } catch (error) {
+        console.error(error);
+        alert("Error running prediction");
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Run Prediction";
+    isLoading = false;
+}
+</script>
+
+</body>
+</html>
