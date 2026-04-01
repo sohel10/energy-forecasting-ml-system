@@ -4,7 +4,7 @@ import psycopg2
 def save_predictions(test, forecast, conf_int):
 
     conn = psycopg2.connect(
-        host="localhost",
+        host="db",
         database="weather_db",
         user="postgres",
         password="1234"

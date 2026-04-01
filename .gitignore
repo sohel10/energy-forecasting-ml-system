@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+
+# Environment
+.env
+venv/
+env/
+
+# Database / local files
+*.db
+
+# OS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Your file
+note.txt   ✅
+pipeline.log   ✅
+note.txt
+pipeline.log
+.env
+__pycache__/
+*.pyc
+*.log

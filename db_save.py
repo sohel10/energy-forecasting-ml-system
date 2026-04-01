@@ -1,14 +1,7 @@
-import os
-
-import psycopg2
+from db_connection import get_connection
 
 def save_to_db(df):
-    conn = psycopg2.connect(
-        host="localhost",
-        database="weather_db",
-        user="postgres",
-        password=os.getenv("DB_PASSWORD")
-    )
+    conn = get_connection()
 
     cursor = conn.cursor()
 
