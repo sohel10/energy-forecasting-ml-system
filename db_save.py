@@ -2,10 +2,8 @@ from db_connection import get_connection
 
 def save_to_db(df):
     conn = get_connection()
-
     cursor = conn.cursor()
 
-    # Create table
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS weather_data (
         datetime TIMESTAMP,
@@ -15,7 +13,6 @@ def save_to_db(df):
     )
     """)
 
-    # Insert data
     for _, row in df.iterrows():
         cursor.execute("""
         INSERT INTO weather_data (datetime, temp, humidity, wind_speed)
@@ -23,4 +20,4 @@ def save_to_db(df):
         """, (row['datetime'], row['temp'], row['humidity'], row['wind_speed']))
 
     conn.commit()
-    conn.close()
+    conn.close()   # ✅ FIXED

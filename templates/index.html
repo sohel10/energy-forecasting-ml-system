@@ -147,36 +147,19 @@ async function getPrediction() {
                 borderDash: [5,5],
                 tension: 0.3,
                 pointRadius: 2
-            },
-
-            // 🔶 Upper CI
-            {
-                label: 'Upper CI',
-                data: upper,
-                borderColor: 'rgba(255,0,0,0.3)',
-                borderWidth: 1,
-                pointRadius: 0
-            },
-
-            // 🔶 Lower CI (fills area)
-            {
-                label: 'Lower CI',
-                data: lower,
-                borderColor: 'rgba(255,0,0,0.3)',
-                borderWidth: 1,
-                fill: '-1',
-                backgroundColor: 'rgba(255,0,0,0.1)',
-                pointRadius: 0
             }
         ]
             },
 
-                    // 🔥 ADD THIS BLOCK HERE (THIS IS WHAT YOU MISSED)
-            options: {
+           options: {
                 responsive: true,
                 plugins: {
                     legend: {
                         position: 'top'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Energy Output Forecast vs Actual'
                     },
                     tooltip: {
                         mode: 'index',
@@ -185,9 +168,19 @@ async function getPrediction() {
                 },
                 scales: {
                     x: {
+                        title: {
+                            display: true,
+                            text: 'Date & Time'
+                        },
                         ticks: {
                             maxRotation: 45,
                             minRotation: 45
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Energy Output (Synthetic Units)'
                         }
                     }
                 }

@@ -4,18 +4,16 @@ import requests
 import pandas as pd
 
 
-API_KEY = "95774e34fcabbeb236401ceed0377f6f"
+#API_KEY = "95774e34fcabbeb236401ceed0377f6f"
 
-CITY = "Houston"
-
-import requests
-import pandas as pd
+#CITY = "Houston"
 
 def ingest_data():
+    import requests
+    import pandas as pd
+
     API_KEY = "95774e34fcabbeb236401ceed0377f6f"
-
     CITY = "Houston"
-
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
 
     response = requests.get(url)
@@ -34,4 +32,7 @@ def ingest_data():
 
     df = pd.DataFrame(records)
 
-    return df   # 🔥 VERY IMPORTANT
+    # 🔥 FIX HERE
+    df["datetime"] = pd.to_datetime(df["datetime"])
+
+    return df

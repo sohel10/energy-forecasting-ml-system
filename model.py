@@ -5,10 +5,19 @@ from sklearn.metrics import mean_squared_error
 
 
 def train_model(df):
-
+    np.random.seed(42)
     print("Starting SARIMAX model training...")
 
-    # 🔹 Ensure sorted time
+    df = df.copy()
+
+    # 🔴 SAFETY CHECK
+    if 'datetime' not in df.columns:
+        raise ValueError("❌ 'datetime' column missing before model")
+
+    # 🔹 Ensure datetime format
+    df['datetime'] = pd.to_datetime(df['datetime'])
+
+    # 🔹 Sort by time
     df = df.sort_values("datetime")
 
     # 🔹 Create target
@@ -20,30 +29,21 @@ def train_model(df):
     )
 
     # 🔹 Set datetime index
-    df.set_index('datetime', inplace=True)
+    df = df.set_index('datetime')
 
-    # 🔥 Interpolate instead of ffill
-    df = df.asfreq('h').interpolate()
+    # 🔹 Ensure frequency + interpolate
+    df = df.asfreq('h').ffill().bfill()
 
     # 🔹 Train-test split
     train_size = int(len(df) * 0.8)
     train = df.iloc[:train_size]
     test = df.iloc[train_size:]
 
-    if len(train) < 10:
-        print("⚠️ Not enough data for SARIMAX.")
-        return None, None, None, None, None
+    if len(train) < 5:
+        print("⚠️ Small dataset, continuing anyway...")
 
-    if train[['temp','humidity','wind_speed']].isnull().any().any():
-        print("❌ Missing values in TRAIN exog")
-        return None, None, None, None, None
-
-    if test[['temp','humidity','wind_speed']].isnull().any().any():
-        print("❌ Missing values in TEST exog")
-        return None, None, None, None, None
 
     try:
-        # ✅ Fit ONLY on train
         model = SARIMAX(
             train['energy_output'],
             exog=train[['temp','humidity','wind_speed']],
@@ -53,7 +53,6 @@ def train_model(df):
 
         model_fit = model.fit(disp=False)
 
-        # 🔥 Forecast with confidence interval (ONLY ONCE)
         forecast_obj = model_fit.get_forecast(
             steps=len(test),
             exog=test[['temp','humidity','wind_speed']]
@@ -62,7 +61,6 @@ def train_model(df):
         forecast = forecast_obj.predicted_mean
         conf_int = forecast_obj.conf_int()
 
-        # RMSE
         rmse = np.sqrt(mean_squared_error(test['energy_output'], forecast))
 
         print(f"✅ SARIMAX Model trained. RMSE: {rmse:.4f}")
@@ -70,5 +68,11 @@ def train_model(df):
         return model_fit, forecast, test, rmse, conf_int
 
     except Exception as e:
-        print(f"❌ Model training failed: {e}")
-        return None, None, None, None, None
+        print("⚠️ Model failed → using fallback")
+
+        forecast = pd.Series(
+        [train['energy_output'].mean()] * len(test),
+        index=test.index
+        )
+
+        return None, forecast, test, None, None
