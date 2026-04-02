@@ -1,19 +1,18 @@
-
-
+from dotenv import load_dotenv
+import os
 import requests
 import pandas as pd
 
+load_dotenv()
 
-#API_KEY = "95774e34fcabbeb236401ceed0377f6f"
+def fetch_data():
 
-#CITY = "Houston"
+    API_KEY = os.getenv("API_KEY")
+    CITY = os.getenv("CITY", "Houston")
 
-def ingest_data():
-    import requests
-    import pandas as pd
+    if not API_KEY:
+        raise ValueError("❌ API_KEY not found in .env")
 
-    API_KEY = "95774e34fcabbeb236401ceed0377f6f"
-    CITY = "Houston"
     url = f"http://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
 
     response = requests.get(url)
@@ -32,7 +31,9 @@ def ingest_data():
 
     df = pd.DataFrame(records)
 
-    # 🔥 FIX HERE
+    if df.empty:
+        raise ValueError("❌ No data returned from API")
+
     df["datetime"] = pd.to_datetime(df["datetime"])
 
     return df

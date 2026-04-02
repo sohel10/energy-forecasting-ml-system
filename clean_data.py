@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def clean_data(df):
 
     print("🔍 CLEAN INPUT COLUMNS:", df.columns)
@@ -8,7 +9,6 @@ def clean_data(df):
     # 🔥 STEP 1: Ensure datetime exists
     if 'datetime' not in df.columns:
 
-        # try to auto-detect
         found = False
         for col in df.columns:
             if 'time' in col.lower() or 'date' in col.lower():
@@ -17,7 +17,6 @@ def clean_data(df):
                 print(f"✅ Renamed {col} → datetime")
                 break
 
-        # 🔴 If still not found → CREATE FAKE DATETIME (FAILSAFE)
         if not found:
             print("⚠️ No datetime column found → creating synthetic datetime")
             df['datetime'] = pd.date_range(
@@ -26,10 +25,7 @@ def clean_data(df):
                 freq="H"
             )
 
-    # 🔹 Convert to datetime
     df['datetime'] = pd.to_datetime(df['datetime'], errors='coerce')
-
-    # 🔴 Drop rows where datetime failed
     df = df.dropna(subset=['datetime'])
 
     # 🔹 Clean numeric columns
@@ -46,3 +42,27 @@ def clean_data(df):
     print("✅ CLEAN OUTPUT COLUMNS:", df.columns)
 
     return df
+
+
+# ==============================
+# MAIN EXECUTION (THIS WAS MISSING)
+# ==============================
+if __name__ == "__main__":
+
+    print("📡 Fetching data from pipeline...")
+
+    try:
+        from ingest_data import fetch_data  # adjust if function name differs
+        df = fetch_data()
+    except Exception as e:
+        print(f"❌ Failed to fetch data: {e}")
+        exit()
+
+    print("🧹 Cleaning data...")
+
+    df_clean = clean_data(df)
+
+    # 🔥 SAVE FILE
+    df_clean.to_csv("cleaned_data.csv", index=False)
+
+    print("💾 cleaned_data.csv saved successfully")

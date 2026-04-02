@@ -1,37 +1,41 @@
 import pandas as pd
 import numpy as np
+import joblib
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from sklearn.metrics import mean_squared_error
 
+MODEL_PATH = "model.pkl"
 
+
+# ==============================
+# TRAIN MODEL
+# ==============================
 def train_model(df):
-    np.random.seed(42)
-    print("Starting SARIMAX model training...")
+    print("🚀 Starting SARIMAX model training...")
 
     df = df.copy()
 
-    # 🔴 SAFETY CHECK
+    # 🔴 CHECK datetime
     if 'datetime' not in df.columns:
         raise ValueError("❌ 'datetime' column missing before model")
 
-    # 🔹 Ensure datetime format
+    # 🔹 Convert datetime
     df['datetime'] = pd.to_datetime(df['datetime'])
 
-    # 🔹 Sort by time
+    # 🔹 Sort
     df = df.sort_values("datetime")
 
-    # 🔹 Create target
+    # 🔥 CREATE TARGET (NO RANDOM NOISE)
     df['energy_output'] = (
-        df['wind_speed'] * 0.5 +
-        df['temp'] * 0.2 -
-        df['humidity'] * 0.1 +
-        np.random.normal(0, 0.3, len(df))
+        df['wind_speed'] * 0.6 +
+        df['temp'] * 0.3 -
+        df['humidity'] * 0.2
     )
 
-    # 🔹 Set datetime index
+    # 🔹 Set index
     df = df.set_index('datetime')
 
-    # 🔹 Ensure frequency + interpolate
+    # 🔹 Ensure hourly frequency
     df = df.asfreq('h').ffill().bfill()
 
     # 🔹 Train-test split
@@ -39,23 +43,23 @@ def train_model(df):
     train = df.iloc[:train_size]
     test = df.iloc[train_size:]
 
-    if len(train) < 5:
-        print("⚠️ Small dataset, continuing anyway...")
-
+    if len(train) < 10:
+        print("⚠️ Small dataset, model may be unstable")
 
     try:
         model = SARIMAX(
             train['energy_output'],
-            exog=train[['temp','humidity','wind_speed']],
-            order=(1,1,1),
-            seasonal_order=(0,0,0,0)
+            exog=train[['temp', 'humidity', 'wind_speed']],
+            order=(1, 1, 1),
+            seasonal_order=(0, 0, 0, 0)
         )
 
         model_fit = model.fit(disp=False)
 
+        # 🔹 Forecast
         forecast_obj = model_fit.get_forecast(
             steps=len(test),
-            exog=test[['temp','humidity','wind_speed']]
+            exog=test[['temp', 'humidity', 'wind_speed']]
         )
 
         forecast = forecast_obj.predicted_mean
@@ -63,16 +67,78 @@ def train_model(df):
 
         rmse = np.sqrt(mean_squared_error(test['energy_output'], forecast))
 
-        print(f"✅ SARIMAX Model trained. RMSE: {rmse:.4f}")
+        print(f"✅ Model trained successfully | RMSE: {rmse:.4f}")
+
+        # 💾 SAVE MODEL
+        joblib.dump(model_fit, MODEL_PATH)
+        print("💾 model.pkl saved")
 
         return model_fit, forecast, test, rmse, conf_int
 
     except Exception as e:
-        print("⚠️ Model failed → using fallback")
+        print(f"⚠️ Model failed: {e}")
 
         forecast = pd.Series(
-        [train['energy_output'].mean()] * len(test),
-        index=test.index
+            [train['energy_output'].mean()] * len(test),
+            index=test.index
         )
 
         return None, forecast, test, None, None
+
+
+# ==============================
+# LOAD MODEL
+# ==============================
+def load_model():
+    try:
+        model = joblib.load(MODEL_PATH)
+        print("✅ Model loaded")
+        return model
+    except Exception as e:
+        print(f"❌ Failed to load model: {e}")
+        return None
+
+
+# ==============================
+# PREDICT (API USE)
+# ==============================
+def predict(model, df):
+    if model is None:
+        raise ValueError("❌ Model not loaded")
+
+    df = df.copy()
+
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.sort_values("datetime")
+    df = df.set_index('datetime')
+    df = df.asfreq('h').ffill().bfill()
+
+    forecast_obj = model.get_forecast(
+        steps=len(df),
+        exog=df[['temp', 'humidity', 'wind_speed']]
+    )
+
+    forecast = forecast_obj.predicted_mean
+    conf_int = forecast_obj.conf_int()
+
+    return forecast, conf_int
+
+
+# ==============================
+# MAIN EXECUTION
+# ==============================
+if __name__ == "__main__":
+
+    print("📦 Loading cleaned data...")
+
+    try:
+        df = pd.read_csv("cleaned_data.csv")
+    except Exception as e:
+        print(f"❌ Failed to load data: {e}")
+        exit()
+
+    print("📊 Data loaded, starting training...")
+
+    train_model(df)
+
+    print("🎯 Training complete!")

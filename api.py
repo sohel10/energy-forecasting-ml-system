@@ -1,49 +1,57 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
-from main_pipeline import run_pipeline
 
-# 👉 ADD THIS
+from model import load_model, predict as model_predict
+from ingest_data import fetch_data
+from clean_data import clean_data
+
 from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
-# 👉 ENABLE METRICS
+# ✅ Load model ONCE
+model = load_model()
+
+# ✅ Metrics
 Instrumentator().instrument(app).expose(app)
 
 templates = Jinja2Templates(directory="templates")
 templates.env.cache = {}
 
+
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+
 @app.get("/predict")
-def predict():
-    output = run_pipeline()
-    print("DEBUG OUTPUT:", output)
+def predict_api():
 
-    actual = output.get("actual", [])
-    predicted = output.get("predicted", [])
-    datetime_vals = output.get("datetime", [])
+    print("📡 Fetching data...")
+    df = fetch_data()
 
-    # 🚨 fallback if datetime missing
-    if not datetime_vals:
-        datetime_vals = list(range(len(actual)))
+    print("🧹 Cleaning data...")
+    df = clean_data(df)
 
-    formatted_data = [
-        {
+    print("🤖 Predicting...")
+    forecast, conf_int = model_predict(model, df)
+
+    datetime_vals = df["datetime"].tolist()
+
+    formatted_data = []
+
+    for i, dt in enumerate(datetime_vals):
+        formatted_data.append({
             "datetime": str(dt),
-            "actual": float(a),
-            "predicted": float(p),
-            "lower": None,
-            "upper": None
-        }
-        for dt, a, p in zip(datetime_vals, actual, predicted)
-    ]
+            "actual": None,
+            "predicted": float(forecast.iloc[i]),
+            "lower": float(conf_int.iloc[i, 0]) if conf_int is not None else None,
+            "upper": float(conf_int.iloc[i, 1]) if conf_int is not None else None
+        })
 
     return {
         "status": "success",
         "message": "Forecast generated successfully",
         "data": formatted_data,
-        "rmse": float(output.get("rmse")) if output.get("rmse") else None
+        "rmse": None
     }

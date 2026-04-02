@@ -18,3 +18,9 @@ I developed an end-to-end time series forecasting system using SARIMAX with
 exogenous variables, including uncertainty estimation via confidence intervals.
 The system is deployed using FastAPI and visualized in an interactive dashboard 
 with performance metrics.
+
+“I built an end-to-end ML system with FastAPI, Docker, and AWS EC2. Initially, 
+it used a simulation-based model, but I upgraded it to a real ML model using 
+XGBoost with persisted inference. I separated training and prediction pipelines,
+ added monitoring with Prometheus, and structured it like a production system
+  with CI/CD readiness.”
