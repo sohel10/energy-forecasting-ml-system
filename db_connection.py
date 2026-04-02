@@ -16,7 +16,7 @@ def get_connection(max_retries=10, delay=3):
     port = os.getenv("DB_PORT", "5432")
     database = os.getenv("DB_NAME", "weather_db")
     user = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD")
+    password = os.getenv("DB_PASSWORD", os.getenv("POSTGRES_PASSWORD"))
 
     if not password:
         raise ValueError("❌ DB_PASSWORD is not set in environment variables")

@@ -7,4 +7,5 @@ scikit-learn
 requests
 psycopg2-binary
 statsmodels
+python-dotenv
 prometheus-fastapi-instrumentator
