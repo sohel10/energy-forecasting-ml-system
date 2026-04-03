@@ -114,7 +114,6 @@ energy_forecasting/
 
 ````
 
-````
 ## 📊 Monitoring Dashboard
 Real-time monitoring of API requests and system performance using Prometheus and Grafana:
 
@@ -122,7 +121,7 @@ Real-time monitoring of API requests and system performance using Prometheus and
 
 ![System Monitoring](images/g2.png)
 
----
+
 ## 🚀 How to Run
 
 ```bash
