@@ -1,3 +1,4 @@
+![CI/CD](https://github.com/sohel10/energy-forecasting-ml-system/actions/workflows/deploy.yml/badge.svg)
 # energy-forecasting-ml-system
 # ⚡ Energy Forecasting ML System (Production-Ready)
 
@@ -120,7 +121,28 @@ Real-time monitoring of API requests and system performance using Prometheus and
 ### 📈 Monitoring & System Metrics (Grafana)
 
 ![System Monitoring](images/g2.png)
+## 🔁 CI/CD Pipeline
 
+This project uses **GitHub Actions for continuous integration and deployment (CI/CD)** to automate the build and deployment process.
+
+---
+
+### ⚙️ Pipeline Overview
+
+```text
+Local Development
+        ↓
+    git push
+        ↓
+GitHub Actions (CI/CD)
+        ↓
+Build Docker Image
+        ↓
+Push to AWS ECR
+        ↓
+Deploy to AWS EC2
+        ↓
+Run FastAPI + ML Model + Monitoring
 
 ## 🚀 How to Run
 

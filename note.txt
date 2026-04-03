@@ -24,3 +24,31 @@ it used a simulation-based model, but I upgraded it to a real ML model using
 XGBoost with persisted inference. I separated training and prediction pipelines,
  added monitoring with Prometheus, and structured it like a production system
   with CI/CD readiness.”
+
+  If you want to go even stronger:
+
+Add:
+train.py (separate training)
+Add:
+cron job OR Airflow
+Add:
+GitHub Actions (CI/CD)
+
+
+[ML API]        → FastAPI + model
+[Airflow]       → scheduling / pipelines
+[PostgreSQL]    → shared database (optional)
+[Prometheus]    → monitoring
+[Grafana]       → dashboard
+
+User → FastAPI (ML API)
+        ↓
+   model.pkl (inference)
+        ↓
+   PostgreSQL (optional)
+        ↓
+Prometheus → Grafana
+
+Airflow (separate container)
+        ↓
+Triggers pipelines (train / update)
