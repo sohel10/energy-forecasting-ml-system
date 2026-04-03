@@ -1,92 +1,31 @@
-name: CI-CD Pipeline
+name: Deploy to EC2
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
-
-permissions:
-  id-token: write
-  contents: read
-
-env:
-  BUILDX_INSTALL: false   # <<< IMPORTANT FIX <<<
 
 jobs:
-
-  Continuous-Integration:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          cd energy-forecasting-ml-system || git clone https://github.com/sohel10/energy-forecasting-ml-system.git
 
-      - name: Lint Code
-        run: echo "Linting..."
+          cd energy-forecasting-ml-system
 
-      - name: Run Unit Tests
-        run: echo "Running unit tests..."
+          git pull
 
-  Continuous-Delivery:
-    needs: Continuous-Integration
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+          docker stop energy-app || true
+          docker rm energy-app || true
 
-      - name: Disable Buildx (GitHub auto-builder)
-        run: |
-          docker buildx rm default || true
+          docker build -t energy-app .
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and Push Docker Image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
-          IMAGE_TAG: latest
-        run: |
-          echo "Building Docker image..."
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-  Continuous-Deployment:
-    needs: Continuous-Delivery
-    runs-on: self-hosted
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Pull latest container
-        run: |
-          docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-
-      - name: Restart container
-        run: |
-          docker rm -f cnncls || true
-          docker run -d -p 8080:8080 \
-            --name cnncls \
-            ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
-
-      - name: Cleanup
-        run: docker system prune -f
+          docker run -d -p 8000:8000 energy-app
