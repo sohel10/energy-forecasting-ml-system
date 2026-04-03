@@ -29,3 +29,7 @@ pipeline.log
 __pycache__/
 *.pyc
 *.log
+*.pem
+.env
+model.pkl
+cleaned_data.csv
